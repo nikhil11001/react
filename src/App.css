@@ -17,6 +17,22 @@
   margin-top: 30px;
 }
 
+.margin-left-35{
+  margin-left: 35px;
+}
+
+.margin-left-10{
+  margin-left: 10px;
+}
+
+.margin-bottom-20{
+  margin-bottom: 20px;
+}
+
+.margin-top-10{
+  margin-top: 10px;
+}
+
 .margin-left--7per{
   margin-left: -7%;
 }
@@ -33,6 +49,20 @@
 .App-intro {
   font-size: large;
 }
+
+.text-center{
+  text-align: center;
+}
+.login-page{
+  width: 30%;
+  margin: auto;
+}
+
+.tableSize{
+  height: 500px;
+  overflow: scroll;
+}
+
 
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
