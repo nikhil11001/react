@@ -11,55 +11,40 @@ class App extends Component {
     super();
     this.state = {
       id:"",
-      name: "",
-      phone: "",
-      city: "",
-      country: "",
-      userData: [
-        {
-          name: "Saurabh",
-          phone: "1234567890",
-          city: "Nagar",
-          country: "India"
-        },
-        {
-          name: "Sagar",
-          phone: "12345678",
-          city: "Jalgaon",
-          country: "India"
-        },
-        {
-          name: "Nagesh",
-          phone: "1234590",
-          city: "Nanded",
-          country: "India"
-        }
-
-      ]
+      uid: "",
+      title: "",
+      body: "",
+      selectedId:"",
+      userData: []
     }
   }
   render() {
     return (
       <div className="App">
-        <h1>User Basic <i>CRUD</i> Operations</h1>
+        <h1 className="margin-bottom-20">User Basic <i>CRUD</i> Operations</h1>
         <Row>
-          <Col md={4}>
-            <select onChange={this.handleSelectChange.bind(this)}>
-            <option>Select Id</option>
-             {this.state.userData.map((user)=>{
+          <Col md={4} className="margin-left-35">
+           
+            <FormControl placeholder="Enter Id" type="text" value={this.state.id} onChange={this.updateData.bind(this, "id")} />
+            <FormControl className="margin-top-30" placeholder="Enter Uid" type="text" value={this.state.uid} onChange={this.updateData.bind(this, "uid")} />
+            <FormControl className="margin-top-30" placeholder="Enter Title" type="text" value={this.state.title} onChange={this.updateData.bind(this, "title")} />
+            <FormControl className="margin-top-30" placeholder="Enter Body" type="text" value={this.state.body} onChange={this.updateData.bind(this, "body")} />
+            <select className="form-control margin-top-30" 
+            value={this.state.selectedId} onChange={this.handleSelectChange.bind(this)}>
+            <option>Select Id To Delete or Update Record</option>
+             {this.state.userData.map((user,i)=>{
                return(
-                 <option>{user.id}</option>
+                 <option key={i} value={user.id}>{user.id}</option>
                );
              })}
             </select>
-            <FormControl placeholder="Enter Name" type="text" value={this.state.name} onChange={this.updateData.bind(this, "name")} />
-            <FormControl className="margin-top-30" placeholder="Enter Phone" type="text" value={this.state.phone} onChange={this.updateData.bind(this, "phone")} />
-            <FormControl className="margin-top-30" placeholder="Enter City" type="text" value={this.state.city} onChange={this.updateData.bind(this, "city")} />
-            <FormControl className="margin-top-30" placeholder="Enter Country" type="text" value={this.state.country} onChange={this.updateData.bind(this, "country")} />
-            <Button onClick={this.handleSaveClick.bind(this)} className="margin-top-30" bsStyle="primary">SAVE</Button>
-            <Button onClick={this.handleDeleteClick.bind(this)} className="margin-top-30" bsStyle="primary">DELETE</Button>
+            <Button onClick={this.handleSaveClick.bind(this)} className="margin-top-30" bsStyle="primary">SAVE / UPDATE</Button>
+            <Button onClick={this.handleDeleteClick.bind(this)} className="margin-top-30 margin-left-10" bsStyle="danger">DELETE</Button>
+
+           
           </Col>
-          <Col md={6} className="table-style">
+          <Col md={6} className="table-style ">
+           <div className="tableSize">
             <Table striped bordered condensed hover>
               <thead>
                 <tr>
@@ -71,7 +56,7 @@ class App extends Component {
               </thead>
               <tbody>
                 {this.state.userData.map((user, i) => {
-                  return (<tr>
+                  return (<tr key={i}>
                     <td>{user.userId}</td>
                     <td>{user.id}</td>
                     <td>{user.title}</td>
@@ -80,6 +65,8 @@ class App extends Component {
                 })}
               </tbody>
             </Table>
+            
+                 </div>
           </Col>
         </Row>
       </div>
@@ -89,44 +76,51 @@ class App extends Component {
     this.getUserData();
   }
   handleSelectChange(e){
-    this.setState({id:e.target.value});
+    this.setState({selectedId:e.target.value});
+    this.getUserDataById(e.target.value);
   }
   handleSaveClick() {
     let config = {
       method: 'post',
       url: "https://jsonplaceholder.typicode.com/posts",
       data: {
-        id: this.state.name,
-        userId: this.state.phone,
-        title: this.state.city,
-        body: this.state.country
+        id: this.state.id,
+        userId: this.state.uid,
+        title: this.state.title,
+        body: this.state.body
       }
     }
-    if(this.state.id){
+    if(this.state.selectedId){
       config.method='put'
+      config.url= "https://jsonplaceholder.typicode.com/posts/"+this.state.selectedId;
     }
     axios(config).then((response) => {
       this.setState({
-        name:"",phone:"",city:"",country:""
+        id:"",uid:"",title:"",body:"",selectedId:""
       })
+      alert("Data Saved");
       this.getUserData();
     });
   }
   handleDeleteClick(){
-    debugger;
     let id=parseInt(this.state.id);
     let config={
       method:'delete',
       url: "https://jsonplaceholder.typicode.com/posts/"+id
     }
     axios(config).then(()=>{
+      
+      this.setState({
+        id:"",uid:"",title:"",body:"",selectedId:""
+      })
       this.getUserData();
+      alert("Data Deleted");
     })
   }
   getUserData() {
     let config={
       method: 'get',
-      url: "https://jsonplaceholder.typicode.com/posts"
+      url: "https://jsonplaceholder.typicode.com/posts  "
 
     }
     axios(config)
@@ -134,15 +128,33 @@ class App extends Component {
         this.setState({ userData: response.data })
       });
   }
+
+  getUserDataById(id) {
+    let config={
+      method: 'get',
+      url: "https://jsonplaceholder.typicode.com/posts/"+id
+
+    }
+    axios(config)
+      .then((response) => {
+        console.log(response.data);
+        this.setState({ 
+        id:response.data.id,
+        uid:response.data.userId,
+        title:response.data.title,
+        body:response.data.body
+      })
+      });
+  }
   updateData(filedName, e) {
     switch (filedName) {
-      case "name": this.setState({ name: e.target.value });
+      case "id": this.setState({ id: e.target.value });
         break;
-      case "phone": this.setState({ phone: e.target.value });
+      case "uid": this.setState({ uid: e.target.value });
         break;
-      case "city": this.setState({ city: e.target.value });
+      case "title": this.setState({ title: e.target.value });
         break;
-      case "country": this.setState({ country: e.target.value });
+      case "body": this.setState({ body: e.target.value });
         break;
 
     }
